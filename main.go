@@ -4,9 +4,14 @@ import (
 	"database/sql"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/FkLalita/Stocol/handlers"
+	"github.com/FkLalita/Stocol/models"
+	"github.com/FkLalita/Stocol/utils"
+
+	"github.com/gorilla/mux"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -21,29 +26,57 @@ func main() {
 	defer db.Close()
 
 	// Define routes and handlers for user registration, authentication, and story collaboration.
-	http.HandleFunc("/", homeHandler)
+	r := mux.NewRouter()
 
-	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		homeHandler(db, w, r)
+	})
+
+	r.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		handlers.RegisterHandler(w, r, db)
 	})
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		handlers.LoginHandler(w, r, db)
 	})
 
-	http.HandleFunc("/profile", handlers.ProfileHandler)
+	r.HandleFunc("/profile", handlers.ProfileHandler)
+	r.HandleFunc("/logout", handlers.LogoutHandler)
+
+	r.HandleFunc("/create-story", func(w http.ResponseWriter, r *http.Request) {
+		handlers.CreateStoryHandler(w, r, db)
+	})
 
 	// Start the server.
-	fmt.Println("Starting Server")
-	http.ListenAndServe(":8080", nil)
+	fmt.Println("Starting Server.................")
+	http.ListenAndServe(":8080", r)
 }
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
+func homeHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+	var IsAuthenticated bool
+	user, err := utils.GetSessionUsername(r)
+	if user == "" {
+		IsAuthenticated = false
+	} else {
+		IsAuthenticated = true
+	}
+
+	stories := models.GetAllStories(db)
+	data := struct {
+		IsAuthenticated bool
+		Stories         []models.Story
+	}{
+		IsAuthenticated: IsAuthenticated,
+		Stories:         stories,
+	}
+
 	tmpl, err := template.ParseFiles("templates/index.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tmpl.Execute(w, nil)
+	tmpl.Execute(w, data)
+
 }
