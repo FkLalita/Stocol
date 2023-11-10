@@ -28,6 +28,8 @@ func main() {
 	// Define routes and handlers for user registration, authentication, and story collaboration.
 	r := mux.NewRouter()
 
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		homeHandler(db, w, r)
 	})
@@ -69,7 +71,7 @@ func homeHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		Stories:         stories,
 	}
 
-	tmpl, err := template.ParseFiles("templates/index.html")
+	tmpl, err := template.ParseFiles("templates/index.html", "templates/base.html")
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		log.Println(err)
