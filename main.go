@@ -47,6 +47,17 @@ func main() {
 	r.HandleFunc("/create-story", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CreateStoryHandler(w, r, db)
 	})
+	r.HandleFunc("/story/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
+		handlers.ViewStory(w, r, db)
+	})
+
+	r.HandleFunc("/story/{id:[0-9]+}/edit", func(w http.ResponseWriter, r *http.Request) {
+		handlers.UpdateStory(w, r, db)
+	})
+
+	r.HandleFunc("/story/{id:[0-9]+}/delete", func(w http.ResponseWriter, r *http.Request) {
+		handlers.DeleteStoryHandler(w, r, db)
+	})
 
 	// Start the server.
 	fmt.Println("Starting Server.................")
