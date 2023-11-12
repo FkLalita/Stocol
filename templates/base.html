@@ -1,0 +1,28 @@
+{{define "base"}}
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <title> - Stocol</title>
+        <link rel="stylesheet" type="text/css" href="/static/style.css">
+    </head>
+    <body>
+        <nav>
+            {{if .IsAuthenticated}}
+                <a href="/profile">Profile</a>
+                <a href="/logout">Logout</a>
+                <a href="/create-story">Create</a>
+            {{else}}
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
+            {{end}}
+        </nav>
+        <main>
+          {{template "content" .}}
+        </main>
+       
+        <footer>Powered by <a href='https://golang.org/'>Go</a></footer>
+    </body>
+</html>
+{{end}}
+

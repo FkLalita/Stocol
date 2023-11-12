@@ -1,0 +1,17 @@
+{{template "base" .}}
+
+{{define "content"}}
+  <div style="max-width: 800px; margin: 0 auto;">
+      <h1>Create a New Story</h1>
+      <form action="/create-story" method="post">
+          <label for="title" style="display: block; font-size: 18px; margin-bottom: 5px;">Title:</label>
+          <input type="text" id="title" name="title" required style="width: 100%; padding: 8px; font-size: 16px; margin-bottom: 15px;">
+  
+          <label for="content" style="display: block; font-size: 18px; margin-bottom: 5px;">Content:</label>
+          <textarea id="content" name="content" required style="width: 100%; padding: 8px; font-size: 16px; margin-bottom: 15px; height: 300px;"></textarea>
+
+          <input type="submit" value="Create Story" style="background-color: #4CAF50; color: white; padding: 10px 15px; font-size: 16px; border: none; cursor: pointer;">
+      </form>
+  </div>
+{{end}}
+

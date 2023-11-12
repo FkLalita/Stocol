@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/FkLalita/Stocol/handlers"
 	"github.com/FkLalita/Stocol/models"
@@ -17,7 +18,8 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("mysql", "FkLalita:ayomide.10@tcp(localhost:3306)/Stocol")
+	mySqlConnect := os.Getenv("MYSQLCONNECT")
+	db, err := sql.Open("mysql", mySqlConnect)
 	if err != nil {
 		fmt.Println("Error Conneting To Database", err)
 		return

@@ -1,0 +1,24 @@
+{{template "base" .}}
+
+{{define "content"}}
+<title>{{.Story.Title}}</title>
+<div style="max-width: 800px; margin: 0 auto;">
+  <h1>{{.Story.Title}}</h1>
+      <p style="font-style: italic; color: #777;">Written by: {{.Story.AuthorName}} | Created at: {{.Story.CreatedAt.Format "Jan 2, 2006 15:04:05"}}</p>
+      <hr>
+      <div style="font-size: 18px; line-height: 1.6;">
+          {{.Story.Content}}
+      </div>
+      <hr>
+      <a href="/">Back to Stories</a>
+  </div>
+
+
+
+  {{if .IsAuthor}}
+    <button><a href="/story/{{.Story.StoryID}}/edit">Edit Story</a></button>
+    <form action="/story/{{.Story.StoryID}}/delete" method="post">
+        <input type="submit" value="Delete Story">
+    </form>
+  {{end}}
+{{end}}
