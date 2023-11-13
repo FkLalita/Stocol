@@ -4,7 +4,8 @@
 <title>{{.Story.Title}}</title>
 <div style="max-width: 800px; margin: 0 auto;">
   <h1>{{.Story.Title}}</h1>
-      <p style="font-style: italic; color: #777;">Written by: {{.Story.AuthorName}} | Created at: {{.Story.CreatedAt.Format "Jan 2, 2006 15:04:05"}}</p>
+  <p style="font-style: italic; color: #777;">Written by: {{.Story.AuthorName}} | Created at: {{.Story.CreatedAt.Format "Jan 2, 2006 15:04:05"}}<br>Description: {{.Story.description}}   </p>
+
       <hr>
       <div style="font-size: 18px; line-height: 1.6;">
           {{.Story.Content}}
