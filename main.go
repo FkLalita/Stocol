@@ -76,6 +76,9 @@ func homeHandler(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 
 	stories := models.GetAllStories(db)
+	if stories == nil {
+		log.Println("No story available")
+	}
 	data := struct {
 		IsAuthenticated bool
 		Stories         []models.Story
