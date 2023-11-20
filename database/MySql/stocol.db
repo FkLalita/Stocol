@@ -13,3 +13,12 @@ created_at DATETIME,
 user_id INT,
 FOREIGN KEY (user_id) REFERENCES users(id), 
 );
+
+
+
+CREATE TABLE collaborators (
+    collaborator_id INT AUTO_INCREMENT PRIMARY KEY,
+    story_id INT REFERENCES stories(story_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+    status VARCHAR(255) DEFAULT 'pending'
+ );

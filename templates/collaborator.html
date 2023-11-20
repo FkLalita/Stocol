@@ -1,0 +1,23 @@
+{{template "base" .}}
+
+{{define "content"}}
+</div>
+    <h2>Collaborators:</h2>
+    <ul>
+    {{range .Collaborators}}
+      {{ if .Collaborators.Status = "Accepted" }}
+        <li>ID: {{.Collaborator.CollaboratorID}}, Name: {{.Collaborator.Username}}, StoryID: {{.Story.StoryID}}</li>
+        <form action="/story/{{.Story.StoryID}}/collaborator/accept/{{.Collaborator.CollaboratorID}}" method="post">
+          <input type="submit" value="Accept">
+        </form>
+        <form action="/story/{{.Story.StoryID}}/collaborator/decline/{{.Collaborator.CollaboratorID}}" method="post">
+          <input type="submit" value="Decline">
+        </form>
+      {{ else }}
+        <p>You accepted the collaboration, " {{ .Collaborator.Username }} " can now add changes to your story</p>
+      {{end}}
+    {{end}}    
+    </ul>
+</div>
+{{end}}
+

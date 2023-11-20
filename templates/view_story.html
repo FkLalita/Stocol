@@ -4,22 +4,35 @@
 <title>{{.Story.Title}}</title>
 <div style="max-width: 800px; margin: 0 auto;">
   <h1>{{.Story.Title}}</h1>
-  <p style="font-style: italic; color: #777;">Written by: {{.Story.AuthorName}} | Created at: {{.Story.CreatedAt.Format "Jan 2, 2006 15:04:05"}}<br>Description: {{.Story.description}}   </p>
+  <p style="font-style: italic; color: #777;">Written by: {{.Story.AuthorName}} | Created at: {{.Story.CreatedAt.Format "Jan 2, 2006 15:04:05"}}<br>Description: {{.Story.Description}}   </p>
 
       <hr>
       <div style="font-size: 18px; line-height: 1.6;">
           {{.Story.Content}}
       </div>
       <hr>
+    
       <a href="/">Back to Stories</a>
   </div>
 
-
+ 
 
   {{if .IsAuthor}}
+    {{ range .Collaborators }}
+    <p>{{ .Username }}</p>
+       <!-- Access other fields of the user as needed -->
+    {{ end }}
+    <p><a href="/story/{{.Story.StoryID}}/collaborator">view the collaborators </a></p>
+
+    
     <button><a href="/story/{{.Story.StoryID}}/edit">Edit Story</a></button>
     <form action="/story/{{.Story.StoryID}}/delete" method="post">
-        <input type="submit" value="Delete Story">
+         <input type="submit" value="Delete Story">
     </form>
-  {{end}}
+  {{else}}
+  <p> Do you think the story is missing something, <a href="/story/{{.Story.StoryID}}/collab">click to collab</a></p>
+
+
+  {{end}} 
+
 {{end}}

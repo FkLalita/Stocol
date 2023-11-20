@@ -7,17 +7,19 @@ import (
 )
 
 type Story struct {
-	StoryID    int
-	Title      string
-	Content    string
-	CreatedAt  time.Time
-	AuthorID   int
-	AuthorName string
+	StoryID     int
+	Title       string
+	Description string
+	Content     string
+	CreatedAt   time.Time
+	AuthorID    int
+	AuthorName  string
+	Collaborators []Collaborator
 }
 
-func CreateStory(db *sql.DB, title, content string, created_at time.Time, authorID int, authorName string) error {
+func CreateStory(db *sql.DB, title string, description string, content string, created_at time.Time, authorID int, authorName string) error {
 	// Insert the new story into the database.
-	_, err := db.Exec("INSERT INTO stories (title, content, created_at, author_id, author_name) VALUES (?, ?, ?, ?, ?)", title, content, created_at, authorID, authorName)
+	_, err := db.Exec("INSERT INTO stories (title, description, content, created_at, author_id, author_name) VALUES (?, ?, ?, ?, ?, ?)", title, description, content, created_at, authorID, authorName)
 	if err != nil {
 		return err
 	}
@@ -27,7 +29,7 @@ func CreateStory(db *sql.DB, title, content string, created_at time.Time, author
 func GetAllStories(db *sql.DB) []Story {
 	var stories []Story
 
-	rows, err := db.Query("SELECT * FROM stories")
+	rows, err := db.Query("SELECT story_id, title, description,created_at, author_name FROM stories")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,7 +39,7 @@ func GetAllStories(db *sql.DB) []Story {
 		var s Story
 		var createdAtStr []uint8 // Temporary variable to store the string from the database.
 
-		if err := rows.Scan(&s.StoryID, &s.Title, &s.Content, &createdAtStr, &s.AuthorID, &s.AuthorName); err != nil {
+		if err := rows.Scan(&s.StoryID, &s.Title, &s.Description, &createdAtStr, &s.AuthorName); err != nil {
 			log.Println(err)
 			continue
 		}
@@ -63,59 +65,46 @@ func GetAllStories(db *sql.DB) []Story {
 	return stories
 }
 
-
 func GetStoryDetails(db *sql.DB, story_id int) (Story, error) {
-    var s Story
+	var s Story
 
-    // Query the database to get story details by story ID
-    row := db.QueryRow("SELECT * FROM stories WHERE story_id = ?", story_id)
+	// Query the database to get story details by story ID
+	row := db.QueryRow("SELECT * FROM stories WHERE story_id = ?", story_id)
 
-    // Temporary variable to store the string from the database.
-    var createdAtStr []uint8
+	// Temporary variable to store the string from the database.
+	var createdAtStr []uint8
 
-    // Scan the row to retrieve story details
-    if err := row.Scan(&s.StoryID, &s.Title, &s.Content, &createdAtStr, &s.AuthorID, &s.AuthorName); err != nil {
-        // Handle the error, log it, and return an error
-        log.Println(err)
-        return Story{}, err
-    }
+	// Scan the row to retrieve story details
+	if err := row.Scan(&s.StoryID, &s.Title, &s.Content, &createdAtStr, &s.AuthorID, &s.AuthorName, &s.Description); err != nil {
+		// Handle the error, log it, and return an error
+		log.Println(err)
+		return Story{}, err
+	}
 
-    // Convert the createdAtStr ([]uint8) to a string.
-    createdAtString := string(createdAtStr)
+	// Convert the createdAtStr ([]uint8) to a string.
+	createdAtString := string(createdAtStr)
 
-    // Parse the createdAtString as time.Time.
-    parsedTime, err := time.Parse("2006-01-02 15:04:05", createdAtString)
-    if err != nil {
-        // Handle the error, log it, and return an error
-        log.Println(err)
-        return Story{}, err
-    }
+	// Parse the createdAtString as time.Time.
+	parsedTime, err := time.Parse("2006-01-02 15:04:05", createdAtString)
+	if err != nil {
+		// Handle the error, log it, and return an error
+		log.Println(err)
+		return Story{}, err
+	}
 
-    // Set the CreatedAt field of the story
-    s.CreatedAt = parsedTime
+	// Set the CreatedAt field of the story
+	s.CreatedAt = parsedTime
 
-    // Return the retrieved story
-    return s, nil
+	// Return the retrieved story
+	return s, nil
 }
 
-func UpdateStory(db *sql.DB, storyID int, title, content string, createdAt time.Time, authorID int, authorName string) error {
-    _, err := db.Exec("UPDATE stories SET title=?, content=?, created_at=?, author_id=?, author_name=? WHERE story_id=?", title, content, createdAt, authorID, authorName, storyID)
-    return err
+func UpdateStory(db *sql.DB, storyID int, title string, description string, content string, createdAt time.Time, authorID int, authorName string) error {
+	_, err := db.Exec("UPDATE stories SET title=?,description=?, content=?, created_at=?, author_id=?, author_name=? WHERE story_id=?", title, description, content, createdAt, authorID, authorName, storyID)
+	return err
 }
-
-
-
-
-
-
-
-
-
-
-
 
 func DeleteStory(db *sql.DB, storyID int) error {
-    _, err := db.Exec("DELETE FROM stories WHERE story_id = ?", storyID)
-    return err
+	_, err := db.Exec("DELETE FROM stories WHERE story_id = ?", storyID)
+	return err
 }
-

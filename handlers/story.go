@@ -50,6 +50,8 @@ func CreateStoryHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 
 		title := r.FormValue("title")
+		description := r.FormValue("description")
+
 		content := r.FormValue("content")
 		created_at := time.Now()
 
@@ -67,7 +69,7 @@ func CreateStoryHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 
 		// Create the story with the model
-		if err := models.CreateStory(db, title, content, created_at, authorID, authorName); err != nil {
+		if err := models.CreateStory(db, title, description, content, created_at, authorID, authorName); err != nil {
 			log.Println("Error creating story:", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
@@ -95,9 +97,14 @@ func ViewStory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		return
 	}
 
+	Collaborators, err := models.GetCollaboratorsForStory(db, storyID)
+	if err != nil {
+		log.Println("err fetching colllabs:", err)
+	}
+
 	username, err := utils.GetSessionUsername(r)
 	if err != nil {
-		http.Error(w, "Error Fetching Username", http.StatusBadRequest)
+		log.Println(w, "Error Fetching Username", http.StatusBadRequest)
 	}
 
 	if username == Story.AuthorName {
@@ -111,11 +118,13 @@ func ViewStory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		IsAuthor        bool
 		Story           models.Story
 		IsAuthenticated bool
+		Collaborators   []models.Collaborator
 	}{
 
 		IsAuthor:        IsAuthor,
 		Story:           Story,
 		IsAuthenticated: IsAuthenticated,
+		Collaborators:   Collaborators,
 	}
 
 	tmpl, err := template.ParseFiles("templates/view_story.html", "templates/base.html")
@@ -130,7 +139,7 @@ func ViewStory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	if err := tmpl.ExecuteTemplate(w, "base", data); err != nil {
 		log.Println("Error executing template:", err)
 
-	} 
+	}
 
 }
 func UpdateStory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
@@ -146,6 +155,7 @@ func UpdateStory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	if r.Method == http.MethodPost {
 		// Retrieve form values
 		title := r.FormValue("title")
+		description := r.FormValue("description")
 		content := r.FormValue("content")
 		created_at := time.Now()
 
@@ -166,7 +176,7 @@ func UpdateStory(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		}
 
 		// Update the story with the model
-		err = models.UpdateStory(db, storyID, title, content, created_at, authorID, authorName)
+		err = models.UpdateStory(db, storyID, title, description, content, created_at, authorID, authorName)
 		if err != nil {
 			log.Println("Error updating story:", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -246,3 +256,6 @@ func DeleteStoryHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	// Redirect to the home page or another appropriate page
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+
+

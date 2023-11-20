@@ -61,6 +61,25 @@ func main() {
 		handlers.DeleteStoryHandler(w, r, db)
 	})
 
+	r.HandleFunc("/story/{id:[0-9]+}/collab", func(w http.ResponseWriter, r *http.Request) {
+		handlers.RequestCollab(w, r, db)
+
+	})
+
+	r.HandleFunc("/story/{id:[0-9]+}/collaborator", func(w http.ResponseWriter, r *http.Request) {
+		handlers.GetAllCollab(w, r, db)
+	})
+
+	
+	r.HandleFunc("/story/{id:[0-9]+}/collaborator/accept/{collaboratorID:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
+    handlers.AcceptCollab(w, r, db)
+    })
+
+	r.HandleFunc("/story/{id:[0-9]+}/collaborator/decline/{collaboratorID:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
+    handlers.DeclineCollab(w, r, db)
+    })
+
+
 	// Start the server.
 	fmt.Println("Starting Server.................")
 	http.ListenAndServe(":8080", r)
